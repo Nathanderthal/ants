@@ -31,8 +31,9 @@ public class AntSimulatorPanel extends JPanel
   private static final int ANT_COUNT = 2000;
   private static final int FOOD_COUNT = 30;
   private static final int GRID_DIVISIONS = 100;
-  private static final double PHEREMONE_PER_MOVEMENT = 0.0005;
-  private static final double PHEREMONE_PER_MOVEMENT_WITH_FOOD = PHEREMONE_PER_MOVEMENT * 2;
+  private static final double PHEREMONE_PER_MOVEMENT = 0; //0.00005;
+  private static final double PHEREMONE_PER_MOVEMENT_WITH_FOOD = 0.01;
+  private static final double PHEROMONE_DECAY_RATE = 0.01;
   
   private List<Ant> ants = null;
   private final List<Point> foods = new ArrayList<>();
@@ -55,7 +56,17 @@ public class AntSimulatorPanel extends JPanel
       }
     });
     
+    Timer pheromoneDecayTimer = new Timer(500, new ActionListener()
+    {
+      @Override
+      public void actionPerformed(ActionEvent e)
+      {
+        decayPheromones();
+      }
+    });
+    
     animationTimer.start();
+    pheromoneDecayTimer.start();
     
     addComponentListener(new ComponentAdapter()
     {
@@ -118,6 +129,17 @@ public class AntSimulatorPanel extends JPanel
       for(int j = 0; j < pheremoneLevels[i].length; j++)
       {
         pheremoneLevels[i][j] = 0;
+      }
+    }
+  }
+  
+  private void decayPheromones()
+  {
+    for(int i = 0; i < pheremoneLevels.length; i++)
+    {
+      for(int j = 0; j < pheremoneLevels[i].length; j++)
+      {
+        pheremoneLevels[i][j] = Math.max(0, pheremoneLevels[i][j] - PHEROMONE_DECAY_RATE);
       }
     }
   }
@@ -197,9 +219,15 @@ public class AntSimulatorPanel extends JPanel
     int x = (int)Math.round(ant.getX() * (double)getWidth());
     int y = (int)Math.round(ant.getY() * (double)getHeight());
 
-    if(ant.isReturningWithFood())
+    AntState antState = ant.getAntState();
+    
+    if(antState == AntState.RETURNING_WITH_FOOD)
     {
       g.setColor(Color.RED);
+    }
+    else if(antState == AntState.RETURNING_WITHOUT_FOOD)
+    {
+      g.setColor(Color.BLUE);
     }
     else
     {
