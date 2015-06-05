@@ -18,6 +18,10 @@ import java.util.Stack;
  */
 public class Ant extends Thread
 {
+  //Debug settings
+//  private static final double DEFAULT_SPEED = 0.01;
+//  private static final int DEFAULT_UPDATE_DELAY = 1500;
+  
   private static final double DEFAULT_SPEED = 0.001;
   private static final int DEFAULT_UPDATE_DELAY = 25;
   private static final double TURN_RANGE = Math.PI / 4d;
@@ -79,6 +83,16 @@ public class Ant extends Thread
     return antState;
   }
 
+  public double getLastAngle()
+  {
+    return lastAngle;
+  }
+  
+  public Stack<Point2D.Double> getPathFromHome()
+  {
+    return (Stack<Point2D.Double>)pathFromHome.clone();
+  }
+
   private void update()
   {
     if(antState.isReturning())
@@ -121,52 +135,79 @@ public class Ant extends Thread
         List<Point> validCells = new ArrayList<>();
         
         CellLoop:
-        for(int i = cell.x - 1; i <= cell.x + 1; i++)
+        for(int x = cell.x - 1; x <= cell.x + 1; x++)
         {
-          for(int j = cell.y - 1; j <= cell.y + 1; j++)
+          for(int y = cell.y - 1; y <= cell.y + 1; y++)
           {
-            if(i != cell.x && j != cell.y && antSimulatorPanel.isCellValid(i, j))
+            if((x != cell.x || y != cell.y) && antSimulatorPanel.isCellValid(x, y))
             {
-              double pheremoneValue = antSimulatorPanel.getPheremoneValue(i, j);
+              double pheremoneValue = antSimulatorPanel.getPheremoneValue(x, y);
 
               if(pheremoneValue > 0)
               {
-                double angleForCell = getAngleForCell(i, j);
+                double angleForCell = adjustAngle(getAngleForCell(x, y));
                 
                 double angleDelta = lastAngle - angleForCell;
                 
-                if(angleDelta < PHEROMONE_TURN_RANGE / 2)
+                if(angleForCell > lastAngle - PHEROMONE_TURN_RANGE / 2 &&
+                   angleForCell < lastAngle + PHEROMONE_TURN_RANGE / 2)
                 {
-                  validCells.add(new Point(i, j));
+                  validCells.add(new Point(x, y));
                 }
               }
             }
           }
         }
         
-        //TODO: sort the validCells to give consistent advantage to higher weighted pheromones
+        double maxInfluence = 1d;
+        Point maxInfluenceCell = null;
         
         for(Point p : validCells)
         {
-          if(Math.random() < antSimulatorPanel.getPheremoneValue(p.x, p.y))
+          double influence = Math.random() + antSimulatorPanel.getPheremoneValue(p.x, p.y);
+          
+          while(influence == maxInfluence)
           {
-            angle = getAngleForCell(p.x, p.y);
-            break;
+            //Make sure equal rolls are re-rolled.
+            influence = Math.random() + antSimulatorPanel.getPheremoneValue(p.x, p.y);
+          }
+          
+          if(influence > maxInfluence)
+          {
+            maxInfluence = influence;
+            maxInfluenceCell = p;
           }
         }
 
+        if(maxInfluenceCell != null)
+        {
+          angle = getAngleForCell(maxInfluenceCell.x, maxInfluenceCell.y);
+//          System.out.println("Degrees = " + Math.toDegrees(angle));
+        }
+        
         if(angle < 0)
         {
           angle = lastAngle + (Math.random() * TURN_RANGE) - (TURN_RANGE / 2d);
           angle = adjustAngle(angle);
         }
+        
+//        antSimulatorPanel.updateCellTestDisplay(validCells, maxInfluenceCell);
       }
 
       if(angle >= 0)
       {
-        setCoordinates(x + Ant.this.speed * Math.cos(angle),
-                       y + Ant.this.speed * Math.sin(angle));
+        Point2D.Double lastPoint = new Point2D.Double(x, y);
+        
+        updateCoordinates(angle);
 
+//        System.out.println("angle   = " + angle);
+        
+        double dX = x - lastPoint.x;
+        double dY = y - lastPoint.y;
+        double calculatedAngle = Math.atan2(dY, dX);
+        
+//        System.out.println("reality = " + adjustAngle(calculatedAngle));
+        
         lastAngle = angle;
 
         antSimulatorPanel.updatePheremones(false, x, y);
@@ -207,22 +248,17 @@ public class Ant extends Thread
   {
     Point2D.Double screenPercentCell = antSimulatorPanel.getScreenPercentForCellCenter(cellX, cellY);
 
-    if(x < screenPercentCell.x)
-    {
-      return Math.atan((y - screenPercentCell.y) / (x - screenPercentCell.x));
-    }
-    else if(x > screenPercentCell.x)
-    {
-      return Math.atan((y - screenPercentCell.y) / (x - screenPercentCell.x)) - Math.PI;
-    }
-    else if(y > screenPercentCell.y)
-    {
-      return 3 * (Math.PI / 2);
-    }
-    else
-    {
-      return Math.PI / 2;
-    }
+    double rads = Math.atan2((screenPercentCell.y - y) , (screenPercentCell.x - x));
+
+    rads = adjustAngle(rads);
+
+    return rads;
+  }
+  
+  private void updateCoordinates(double angle)
+  {
+    setCoordinates(x + Ant.this.speed * Math.cos(angle),
+                   y + Ant.this.speed * Math.sin(angle));
   }
   
   private void setCoordinates(double x, double y)

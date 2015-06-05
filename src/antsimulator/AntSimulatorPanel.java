@@ -19,6 +19,7 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -32,12 +33,15 @@ public class AntSimulatorPanel extends JPanel
   private static final int FOOD_COUNT = 30;
   private static final int GRID_DIVISIONS = 100;
   private static final double PHEREMONE_PER_MOVEMENT = 0; //0.00005;
-  private static final double PHEREMONE_PER_MOVEMENT_WITH_FOOD = 0.01;
+  private static final double PHEREMONE_PER_MOVEMENT_WITH_FOOD = 0.02;
   private static final double PHEROMONE_DECAY_RATE = 0.01;
   
   private List<Ant> ants = null;
   private final List<Point> foods = new ArrayList<>();
   private final double[][] pheremoneLevels = new double[GRID_DIVISIONS][GRID_DIVISIONS];
+  
+//  private List<Point> validCells = null;
+//  private Point chosenCell = null;
   
   private Point home;
   
@@ -97,8 +101,10 @@ public class AntSimulatorPanel extends JPanel
   
   private void initializeHome()
   {
-    int x = (int)Math.round(Math.random() * (double)GRID_DIVISIONS);
-    int y = (int)Math.round(Math.random() * (double)GRID_DIVISIONS);
+    double oneThird = (double)GRID_DIVISIONS / 3d;
+    
+    int x = (int)Math.round((Math.random() * oneThird) + oneThird);
+    int y = (int)Math.round((Math.random() * oneThird) + oneThird);
     
     home = new Point(x, y);
   }
@@ -182,6 +188,24 @@ public class AntSimulatorPanel extends JPanel
         }
       }
     }
+    
+//    if(validCells != null)
+//    {
+//      g.setColor(Color.BLUE);
+//      
+//      for(Point cell : validCells)
+//      {
+//        Rectangle cellRect = getScreenRectangleForCell(cell.x, cell.y);
+//        g.fillRect(cellRect.x, cellRect.y, cellRect.width, cellRect.height);
+//      }
+//    }
+//    
+//    if(chosenCell != null)
+//    {
+//      g.setColor(Color.MAGENTA);
+//      Rectangle cellRect = getScreenRectangleForCell(chosenCell.x, chosenCell.y);
+//      g.fillRect(cellRect.x, cellRect.y, cellRect.width, cellRect.height);
+//    }
   }
   
   private void drawHome(Graphics g)
@@ -216,9 +240,8 @@ public class AntSimulatorPanel extends JPanel
   
   private void drawAnt(Ant ant, Graphics g)
   {
-    int x = (int)Math.round(ant.getX() * (double)getWidth());
-    int y = (int)Math.round(ant.getY() * (double)getHeight());
-
+    Point antPoint = getScreenPointForScreenPercent(ant.getX(), ant.getY());
+    
     AntState antState = ant.getAntState();
     
     if(antState == AntState.RETURNING_WITH_FOOD)
@@ -234,7 +257,37 @@ public class AntSimulatorPanel extends JPanel
       g.setColor(Color.BLACK);
     }
     
-    g.drawRect(x, y, 2, 2);
+    g.drawRect(antPoint.x, antPoint.y, 2, 2);
+    
+//    if(chosenCell != null)
+//    {
+//      Stack<Point2D.Double> pathFromHome = ant.getPathFromHome();
+//      
+//      if(pathFromHome != null)
+//      {
+//        if(pathFromHome.size() > 1)
+//        {
+//          Point2D.Double cellPercent = getScreenPercentForCellCenter(chosenCell);
+//          Point cellPoint = getScreenPointForScreenPercent(cellPercent);
+//
+//          Point current = getScreenPointForScreenPercent(pathFromHome.pop());
+//          Point last = getScreenPointForScreenPercent(pathFromHome.peek());
+////          pathFromHome.push(current);
+//
+//          g.setColor(Color.GRAY);
+//          g.drawLine(last.x, last.y, cellPoint.x, cellPoint.y);
+//          g.drawLine(last.x, last.y, current.x, current.y);
+//        }
+//        
+////        while(pathFromHome.size() > 1)
+////        {
+////          Point pathP1 = getScreenPointForScreenPercent(pathFromHome.pop());
+////          Point pathP2 = getScreenPointForScreenPercent(pathFromHome.peek());
+////
+////          g.drawLine(pathP1.x, pathP1.y, pathP2.x, pathP2.y);
+////        }
+//      }
+//    }
   }
   
   private Rectangle getScreenRectangleForCell(Point p)
@@ -292,6 +345,19 @@ public class AntSimulatorPanel extends JPanel
     return new Dimension(width, height);
   }
   
+  private Point getScreenPointForScreenPercent(Point2D.Double p)
+  {
+    return getScreenPointForScreenPercent(p.x, p.y);
+  }
+  
+  private Point getScreenPointForScreenPercent(double pX, double pY)
+  {
+    int x = (int)Math.round(pX * (double)getWidth());
+    int y = (int)Math.round(pY * (double)getHeight());
+    
+    return new Point(x, y);
+  }
+  
   public void updatePheremones(boolean hasFood, double xScreenPercent, double yScreenPercent)
   {
     Point cell = getCellForScreenPercent(xScreenPercent, yScreenPercent);
@@ -335,4 +401,10 @@ public class AntSimulatorPanel extends JPanel
       ant.kill();
     }
   }
+  
+//  public void updateCellTestDisplay(List<Point> validCells, Point chosenCell)
+//  {
+//    this.validCells = validCells;
+//    this.chosenCell = chosenCell;
+//  }
 }
