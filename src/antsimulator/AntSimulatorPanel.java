@@ -19,7 +19,6 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -299,8 +298,8 @@ public class AntSimulatorPanel extends JPanel
   {
     Dimension cell = getDimensionsForCell();
     
-    int x = (int)Math.round(((double)getWidth() / (double)GRID_DIVISIONS) * (double)cellX);
-    int y = (int)Math.round(((double)getHeight() / (double)GRID_DIVISIONS) * (double)cellY);
+    int x = (int)Math.floor(((double)getWidth() / (double)GRID_DIVISIONS) * (double)cellX);
+    int y = (int)Math.floor(((double)getHeight() / (double)GRID_DIVISIONS) * (double)cellY);
     
     return new Rectangle(x, y, cell.width, cell.height);
   }
@@ -339,8 +338,8 @@ public class AntSimulatorPanel extends JPanel
   
   private Dimension getDimensionsForCell()
   {
-    int width = getWidth() / GRID_DIVISIONS;
-    int height = getHeight() / GRID_DIVISIONS;
+    int width = (int)Math.ceil((double)getWidth() / (double)GRID_DIVISIONS);
+    int height = (int)Math.ceil((double)getHeight() / (double)GRID_DIVISIONS);
     
     return new Dimension(width, height);
   }
