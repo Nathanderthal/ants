@@ -221,6 +221,7 @@ public class Ant extends Thread
           if(food.equals(antCell))
           {
             antState = AntState.RETURNING_WITH_FOOD;
+            antSimulatorPanel.updatePheremones(true, x, y);
             lastAngle = -1;
             break;
           }
