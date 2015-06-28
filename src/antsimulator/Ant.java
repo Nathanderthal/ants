@@ -18,39 +18,23 @@ import java.util.Stack;
  */
 public class Ant extends Thread
 {
-  //Debug settings
-//  private static final double DEFAULT_SPEED = 0.01;
-//  private static final int DEFAULT_UPDATE_DELAY = 1500;
-  
-  private static final double DEFAULT_SPEED = 0.001;
-  private static final int DEFAULT_UPDATE_DELAY = 25;
-  private static final double TURN_RANGE = Math.PI / 4d;
-  private static final double PHEROMONE_TURN_RANGE = Math.PI;
-  private static final int PATH_MAX = 1000;
-  
   private double x;
   private double y;
   private double lastAngle;
   
-  private Stack<Point2D.Double> pathFromHome;
-  
-  private double speed;
-  
+  private final Stack<Point2D.Double> pathFromHome;
+
   private boolean go = true;
   
   private AntState antState = AntState.SCOUTING;
   
-  private AntSimulatorPanel antSimulatorPanel;
+  private final AntSimulatorPanel antSimulatorPanel;
+  private final SimulationSettings settings;
   
-  public Ant(AntSimulatorPanel panel)
-  {
-    this(panel, DEFAULT_SPEED);
-  }
-  
-  public Ant(AntSimulatorPanel antSimulatorPanel, double speed)
+  public Ant(AntSimulatorPanel antSimulatorPanel, SimulationSettings settings)
   {
     this.antSimulatorPanel = antSimulatorPanel;
-    this.speed = speed;
+    this.settings = settings;
     
     x = 0;
     y = 0;
@@ -147,10 +131,10 @@ public class Ant extends Thread
               {
                 double angleForCell = adjustAngle(getAngleForCell(x, y));
                 
-                double angleDelta = lastAngle - angleForCell;
+//                double angleDelta = lastAngle - angleForCell;
                 
-                if(angleForCell > lastAngle - PHEROMONE_TURN_RANGE / 2 &&
-                   angleForCell < lastAngle + PHEROMONE_TURN_RANGE / 2)
+                if(angleForCell > lastAngle - settings.getPheremoneTurnRange() / 2 &&
+                   angleForCell < lastAngle + settings.getPheremoneTurnRange() / 2)
                 {
                   validCells.add(new Point(x, y));
                 }
@@ -187,7 +171,7 @@ public class Ant extends Thread
         
         if(angle < 0)
         {
-          angle = lastAngle + (Math.random() * TURN_RANGE) - (TURN_RANGE / 2d);
+          angle = lastAngle + (Math.random() * settings.getTurnRange()) - (settings.getTurnRange() / 2d);
           angle = adjustAngle(angle);
         }
         
@@ -258,8 +242,8 @@ public class Ant extends Thread
   
   private void updateCoordinates(double angle)
   {
-    setCoordinates(x + Ant.this.speed * Math.cos(angle),
-                   y + Ant.this.speed * Math.sin(angle));
+    setCoordinates(x + settings.getSpeed() * Math.cos(angle),
+                   y + settings.getSpeed() * Math.sin(angle));
   }
   
   private void setCoordinates(double x, double y)
@@ -271,7 +255,7 @@ public class Ant extends Thread
     {
       pathFromHome.push(new Point2D.Double(x, y));
       
-      if(pathFromHome.size() >= PATH_MAX)
+      if(pathFromHome.size() >= settings.getPathMax())
       {
         antState = AntState.RETURNING_WITHOUT_FOOD;
       }
@@ -289,7 +273,7 @@ public class Ant extends Thread
       
       try
       {
-        sleep(DEFAULT_UPDATE_DELAY);
+        sleep(settings.getUpdateDelay());
       }
       catch(InterruptedException ex)
       {

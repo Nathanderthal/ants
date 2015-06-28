@@ -13,8 +13,8 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -28,17 +28,13 @@ import javax.swing.Timer;
  */
 public class AntSimulatorPanel extends JPanel
 {
-  private static final int ANT_COUNT = 2000;
-  private static final int FOOD_COUNT = 30;
-  private static final int GRID_DIVISIONS = 100;
-  private static final double PHEREMONE_PER_MOVEMENT = 0; //0.00005;
-  private static final double PHEREMONE_PER_MOVEMENT_WITH_FOOD = 0.02;
-  private static final double PHEROMONE_DECAY_RATE = 0.01;
-  
   private List<Ant> ants = null;
-  private final List<Point> foods = new ArrayList<>();
-  private final double[][] pheremoneLevels = new double[GRID_DIVISIONS][GRID_DIVISIONS];
+  private List<Point> foods = null;
+  private double[][] pheremoneLevels = null;
   
+  private SimulationSettings settings;
+  
+  private SettingsFrame settingsWindow = null;
 //  private List<Point> validCells = null;
 //  private Point chosenCell = null;
   
@@ -46,9 +42,16 @@ public class AntSimulatorPanel extends JPanel
   
   public AntSimulatorPanel()
   {
-    initializePheremoneLevels();
-    initializeHome();
-    initializeFood();
+    settings = new SimulationSettings();
+    
+    addMouseListener(new MouseAdapter()
+    {
+      @Override
+      public void mouseClicked(MouseEvent e)
+      {
+        showSettingsWindow();
+      }
+    });
     
     Timer animationTimer = new Timer(17, new ActionListener()
     {
@@ -71,36 +74,61 @@ public class AntSimulatorPanel extends JPanel
     animationTimer.start();
     pheromoneDecayTimer.start();
     
-    addComponentListener(new ComponentAdapter()
+    reset();
+  }
+
+  public SimulationSettings getSettings()
+  {
+    return settings;
+  }
+  
+  public synchronized void showSettingsWindow()
+  {
+    if(settingsWindow == null)
     {
-      @Override
-      public void componentResized(ComponentEvent e)
-      {
-        if(ants == null &&
-           getSize().getWidth() > 0 &&
-           getSize().getHeight() > 0)
-        {
-          initializeAnts();
-        }
-      }
-    });
+      settingsWindow = new SettingsFrame(this);
+    }
+    
+    if(!settingsWindow.isVisible())
+    {
+      settingsWindow.setFieldsFromSettings();
+      settingsWindow.setVisible(true);
+    }
+  }
+  
+  public final void reset()
+  {
+    kill();
+    
+    initializePheremoneLevels();
+    initializeHome();
+    initializeFood();
+    initializeAnts();
+    engageAnts();
   }
   
   public void initializeAnts()
   {
     ants = new ArrayList<>();
     
-    for(int i = 0; i < ANT_COUNT; i++)
+    for(int i = 0; i < settings.getAntCount(); i++)
     {
-      Ant ant = new Ant(this);
-      ant.start();
+      Ant ant = new Ant(this, settings);
       ants.add(ant);
+    }
+  }
+  
+  public void engageAnts()
+  {
+    for(Ant ant : ants)
+    {
+      ant.start();
     }
   }
   
   private void initializeHome()
   {
-    double oneThird = (double)GRID_DIVISIONS / 3d;
+    double oneThird = (double)settings.getGridDivisions() / 3d;
     
     int x = (int)Math.round((Math.random() * oneThird) + oneThird);
     int y = (int)Math.round((Math.random() * oneThird) + oneThird);
@@ -110,15 +138,17 @@ public class AntSimulatorPanel extends JPanel
   
   private void initializeFood()
   {
-    for(int i = 0; i < FOOD_COUNT; i++)
+    foods = new ArrayList<>();
+    
+    for(int i = 0; i < settings.getFoodCount(); i++)
     {
       Point p = null;
       
       while(p == null ||
             Math.sqrt((p.x - home.x) * (p.x - home.x) + (p.y - home.y) * (p.y - home.y)) < 10)
       {
-        int x = (int)Math.round(Math.random() * (double)GRID_DIVISIONS);
-        int y = (int)Math.round(Math.random() * (double)GRID_DIVISIONS);
+        int x = (int)Math.round(Math.random() * (double)settings.getGridDivisions());
+        int y = (int)Math.round(Math.random() * (double)settings.getGridDivisions());
         
         p = new Point(x, y);
       }
@@ -129,6 +159,8 @@ public class AntSimulatorPanel extends JPanel
   
   private void initializePheremoneLevels()
   {
+    pheremoneLevels = new double[settings.getGridDivisions()][settings.getGridDivisions()];
+    
     for(int i = 0; i < pheremoneLevels.length; i++)
     {
       for(int j = 0; j < pheremoneLevels[i].length; j++)
@@ -144,7 +176,7 @@ public class AntSimulatorPanel extends JPanel
     {
       for(int j = 0; j < pheremoneLevels[i].length; j++)
       {
-        pheremoneLevels[i][j] = Math.max(0, pheremoneLevels[i][j] - PHEROMONE_DECAY_RATE);
+        pheremoneLevels[i][j] = Math.max(0, pheremoneLevels[i][j] - settings.getPheremoneDecayRate());
       }
     }
   }
@@ -298,16 +330,16 @@ public class AntSimulatorPanel extends JPanel
   {
     Dimension cell = getDimensionsForCell();
     
-    int x = (int)Math.floor(((double)getWidth() / (double)GRID_DIVISIONS) * (double)cellX);
-    int y = (int)Math.floor(((double)getHeight() / (double)GRID_DIVISIONS) * (double)cellY);
+    int x = (int)Math.floor(((double)getWidth() / (double)settings.getGridDivisions()) * (double)cellX);
+    int y = (int)Math.floor(((double)getHeight() / (double)settings.getGridDivisions()) * (double)cellY);
     
     return new Rectangle(x, y, cell.width, cell.height);
   }
   
   public Point getCellForScreenPercent(double xScreenPercent, double yScreenPercent)
   {
-    int cellX = (int)Math.floor(xScreenPercent * (double)GRID_DIVISIONS);
-    int cellY = (int)Math.floor(yScreenPercent * (double)GRID_DIVISIONS);
+    int cellX = (int)Math.floor(xScreenPercent * (double)settings.getGridDivisions());
+    int cellY = (int)Math.floor(yScreenPercent * (double)settings.getGridDivisions());
     
     return new Point(cellX, cellY);
   }
@@ -319,8 +351,8 @@ public class AntSimulatorPanel extends JPanel
 
   public Point2D.Double getScreenPercentForCellCenter(int cellX, int cellY)
   {
-    double x = ((double)cellX + 0.5) / (double)GRID_DIVISIONS;
-    double y = ((double)cellY + 0.5) / (double)GRID_DIVISIONS;
+    double x = ((double)cellX + 0.5) / (double)settings.getGridDivisions();
+    double y = ((double)cellY + 0.5) / (double)settings.getGridDivisions();
     
     return new Point2D.Double(x, y);
   }
@@ -332,14 +364,14 @@ public class AntSimulatorPanel extends JPanel
   
   public boolean isCellValid(int x, int y)
   {
-    return x >= 0 && x < GRID_DIVISIONS &&
-           y >= 0 && y < GRID_DIVISIONS;
+    return x >= 0 && x < settings.getGridDivisions() &&
+           y >= 0 && y < settings.getGridDivisions();
   }
   
   private Dimension getDimensionsForCell()
   {
-    int width = (int)Math.ceil((double)getWidth() / (double)GRID_DIVISIONS);
-    int height = (int)Math.ceil((double)getHeight() / (double)GRID_DIVISIONS);
+    int width = (int)Math.ceil((double)getWidth() / (double)settings.getGridDivisions());
+    int height = (int)Math.ceil((double)getHeight() / (double)settings.getGridDivisions());
     
     return new Dimension(width, height);
   }
@@ -367,11 +399,11 @@ public class AntSimulatorPanel extends JPanel
       
       if(hasFood)
       {
-        increase = PHEREMONE_PER_MOVEMENT_WITH_FOOD;
+        increase = settings.getPheremonePerMovementWithFood();
       }
       else
       {
-        increase = PHEREMONE_PER_MOVEMENT;
+        increase = settings.getPheremonePerMovement();
       }
       
       pheremoneLevels[cell.x][cell.y] = Math.min(pheremoneLevels[cell.x][cell.y] + increase, 1);
@@ -395,9 +427,12 @@ public class AntSimulatorPanel extends JPanel
   
   public void kill()
   {
-    for(Ant ant : ants)
+    if(ants != null)
     {
-      ant.kill();
+      for(Ant ant : ants)
+      {
+        ant.kill();
+      }
     }
   }
   
