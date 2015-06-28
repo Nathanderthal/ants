@@ -111,10 +111,15 @@ public class AntSimulatorPanel extends JPanel
   {
     ants = new ArrayList<>();
     
+    int staggerAmount = settings.getStaggerLeavingHome();
+    
+    int staggerTotal = 0;
+    
     for(int i = 0; i < settings.getAntCount(); i++)
     {
-      Ant ant = new Ant(this, settings);
+      Ant ant = new Ant(this, settings, staggerTotal);
       ants.add(ant);
+      staggerTotal = staggerTotal + staggerAmount;
     }
   }
   

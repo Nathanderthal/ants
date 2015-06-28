@@ -26,15 +26,23 @@ public class Ant extends Thread
 
   private boolean go = true;
   
-  private AntState antState = AntState.SCOUTING;
+  private AntState antState = AntState.PUPATING;
+  
+  private int stepsUntilExit;
   
   private final AntSimulatorPanel antSimulatorPanel;
   private final SimulationSettings settings;
   
-  public Ant(AntSimulatorPanel antSimulatorPanel, SimulationSettings settings)
+  public Ant(AntSimulatorPanel antSimulatorPanel, SimulationSettings settings, int exitDelaySteps)
   {
     this.antSimulatorPanel = antSimulatorPanel;
     this.settings = settings;
+    stepsUntilExit = exitDelaySteps;
+    
+    if(stepsUntilExit == 0)
+    {
+      antState = AntState.SCOUTING;
+    }
     
     x = 0;
     y = 0;
@@ -102,6 +110,15 @@ public class Ant extends Thread
         {
           antSimulatorPanel.updatePheremones(antState == AntState.RETURNING_WITH_FOOD, x, y);
         }
+      }
+    }
+    else if(antState == AntState.PUPATING)
+    {
+      stepsUntilExit = stepsUntilExit - 1;
+      
+      if(stepsUntilExit <= 0)
+      {
+        antState = AntState.SCOUTING;
       }
     }
     else

@@ -12,6 +12,7 @@ package antsimulator;
  */
 public enum AntState
 {
+  PUPATING(false),
   SCOUTING(false),
   RETURNING_WITH_FOOD(true),
   RETURNING_WITHOUT_FOOD(true);
@@ -27,5 +28,4 @@ public enum AntState
   {
     return returning;
   }
-  
 }

@@ -41,6 +41,7 @@ public class SettingsFrame extends javax.swing.JFrame
     turnRangeField.setText(Double.toString(settings.getTurnRange()));
     turnRangeWithPheremonesField.setText(Double.toString(settings.getPheremoneTurnRange()));
     antPathMaxStepsField.setText(Integer.toString(settings.getPathMax()));
+    staggerInitialExitField.setText(Integer.toString(settings.getStaggerLeavingHome()));
     
     pheremonePerStepField.setText(Double.toString(settings.getPheremonePerMovement()));
     pheremonePerStepWithFoodField.setText(Double.toString(settings.getPheremonePerMovementWithFood()));
@@ -62,7 +63,8 @@ public class SettingsFrame extends javax.swing.JFrame
       double turnRange = Double.parseDouble(turnRangeField.getText());
       double turnRangeWithPheremones = Double.parseDouble(turnRangeWithPheremonesField.getText());
       int antPathMaxSteps = Integer.parseInt(antPathMaxStepsField.getText());
-
+      int staggerInitialAmount = Integer.parseInt(staggerInitialExitField.getText());
+      
       double pheremonePerStep = Double.parseDouble(pheremonePerStepField.getText());
       double pheremonePerStepWithFood = Double.parseDouble(pheremonePerStepWithFoodField.getText());
       double pheremoneDecayRate = Double.parseDouble(pheremoneDecayRateField.getText());
@@ -76,6 +78,7 @@ public class SettingsFrame extends javax.swing.JFrame
       settings.setTurnRange(turnRange);
       settings.setPheremoneTurnRange(turnRangeWithPheremones);
       settings.setPathMax(antPathMaxSteps);
+      settings.setStaggerLeavingHome(staggerInitialAmount);
       
       settings.setPheremonePerMovement(pheremonePerStep);
       settings.setPheremonePerMovementWithFood(pheremonePerStepWithFood);
@@ -130,6 +133,8 @@ public class SettingsFrame extends javax.swing.JFrame
     pheremonePerStepField = new javax.swing.JTextField();
     pheremonePerStepWithFoodField = new javax.swing.JTextField();
     pheremoneDecayRateField = new javax.swing.JTextField();
+    jLabel4 = new javax.swing.JLabel();
+    staggerInitialExitField = new javax.swing.JTextField();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -173,6 +178,8 @@ public class SettingsFrame extends javax.swing.JFrame
 
     jLabel11.setText("Ant Path Maximum Number of Steps:");
 
+    jLabel4.setText("Stagger Initial Exit (# of Steps):");
+
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
     getContentPane().setLayout(layout);
     layout.setHorizontalGroup(
@@ -202,20 +209,6 @@ public class SettingsFrame extends javax.swing.JFrame
             .addComponent(gridDivisionsField))
           .addGroup(layout.createSequentialGroup()
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-              .addComponent(jLabel7)
-              .addComponent(jLabel8)
-              .addComponent(jLabel9)
-              .addComponent(jLabel10)
-              .addComponent(jLabel11))
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-              .addComponent(stepDistanceField, javax.swing.GroupLayout.DEFAULT_SIZE, 201, Short.MAX_VALUE)
-              .addComponent(stepIntervalField)
-              .addComponent(turnRangeField)
-              .addComponent(turnRangeWithPheremonesField)
-              .addComponent(antPathMaxStepsField)))
-          .addGroup(layout.createSequentialGroup()
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
               .addComponent(pheremonePerStepLabel)
               .addComponent(pheremonePerStepWithFoodLabel)
               .addComponent(pheremoneDecayRateLabel))
@@ -223,7 +216,23 @@ public class SettingsFrame extends javax.swing.JFrame
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
               .addComponent(pheremonePerStepField)
               .addComponent(pheremonePerStepWithFoodField)
-              .addComponent(pheremoneDecayRateField))))
+              .addComponent(pheremoneDecayRateField)))
+          .addGroup(layout.createSequentialGroup()
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+              .addComponent(jLabel7)
+              .addComponent(jLabel8)
+              .addComponent(jLabel9)
+              .addComponent(jLabel10)
+              .addComponent(jLabel11)
+              .addComponent(jLabel4))
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+              .addComponent(stepDistanceField)
+              .addComponent(stepIntervalField)
+              .addComponent(turnRangeField)
+              .addComponent(turnRangeWithPheremonesField)
+              .addComponent(antPathMaxStepsField)
+              .addComponent(staggerInitialExitField, javax.swing.GroupLayout.DEFAULT_SIZE, 201, Short.MAX_VALUE))))
         .addContainerGap())
     );
     layout.setVerticalGroup(
@@ -264,6 +273,10 @@ public class SettingsFrame extends javax.swing.JFrame
           .addComponent(jLabel11)
           .addComponent(antPathMaxStepsField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(jLabel4)
+          .addComponent(staggerInitialExitField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -277,7 +290,7 @@ public class SettingsFrame extends javax.swing.JFrame
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
           .addComponent(pheremoneDecayRateLabel)
           .addComponent(pheremoneDecayRateField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        .addGap(39, 39, 39)
         .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -315,6 +328,7 @@ public class SettingsFrame extends javax.swing.JFrame
   private javax.swing.JLabel jLabel11;
   private javax.swing.JLabel jLabel2;
   private javax.swing.JLabel jLabel3;
+  private javax.swing.JLabel jLabel4;
   private javax.swing.JLabel jLabel7;
   private javax.swing.JLabel jLabel8;
   private javax.swing.JLabel jLabel9;
@@ -327,6 +341,7 @@ public class SettingsFrame extends javax.swing.JFrame
   private javax.swing.JLabel pheremonePerStepLabel;
   private javax.swing.JTextField pheremonePerStepWithFoodField;
   private javax.swing.JLabel pheremonePerStepWithFoodLabel;
+  private javax.swing.JTextField staggerInitialExitField;
   private javax.swing.JTextField stepDistanceField;
   private javax.swing.JTextField stepIntervalField;
   private javax.swing.JTextField turnRangeField;

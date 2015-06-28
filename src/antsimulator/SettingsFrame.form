@@ -52,23 +52,6 @@
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jLabel7" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel8" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel9" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel10" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel11" alignment="0" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="stepDistanceField" pref="201" max="32767" attributes="0"/>
-                          <Component id="stepIntervalField" max="32767" attributes="0"/>
-                          <Component id="turnRangeField" alignment="0" max="32767" attributes="0"/>
-                          <Component id="turnRangeWithPheremonesField" alignment="0" max="32767" attributes="0"/>
-                          <Component id="antPathMaxStepsField" alignment="0" max="32767" attributes="0"/>
-                      </Group>
-                  </Group>
-                  <Group type="102" alignment="0" attributes="0">
-                      <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="pheremonePerStepLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="pheremonePerStepWithFoodLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="pheremoneDecayRateLabel" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -78,6 +61,25 @@
                           <Component id="pheremonePerStepField" max="32767" attributes="0"/>
                           <Component id="pheremonePerStepWithFoodField" max="32767" attributes="0"/>
                           <Component id="pheremoneDecayRateField" alignment="0" max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="jLabel7" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel8" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel9" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel10" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel11" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel4" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="stepDistanceField" max="32767" attributes="0"/>
+                          <Component id="stepIntervalField" max="32767" attributes="0"/>
+                          <Component id="turnRangeField" alignment="0" max="32767" attributes="0"/>
+                          <Component id="turnRangeWithPheremonesField" alignment="0" max="32767" attributes="0"/>
+                          <Component id="antPathMaxStepsField" alignment="0" max="32767" attributes="0"/>
+                          <Component id="staggerInitialExitField" alignment="0" pref="201" max="32767" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
@@ -131,6 +133,11 @@
                   <Component id="antPathMaxStepsField" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="staggerInitialExitField" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="32767" attributes="0"/>
               <Component id="jSeparator3" min="-2" pref="10" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -147,7 +154,7 @@
                   <Component id="pheremoneDecayRateLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="pheremoneDecayRateField" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace min="-2" pref="39" max="-2" attributes="0"/>
               <Component id="jSeparator4" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -258,6 +265,13 @@
     <Component class="javax.swing.JTextField" name="pheremonePerStepWithFoodField">
     </Component>
     <Component class="javax.swing.JTextField" name="pheremoneDecayRateField">
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel4">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Stagger Initial Exit (# of Steps):"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="staggerInitialExitField">
     </Component>
   </SubComponents>
 </Form>
